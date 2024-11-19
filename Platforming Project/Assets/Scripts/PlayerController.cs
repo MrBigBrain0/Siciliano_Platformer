@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     public Rigidbody2D rb;
     public float maxSpeed = 6;
+    Vector2 playerInput;
 
     public enum FacingDirection
     {
@@ -34,15 +35,26 @@ public class PlayerController : MonoBehaviour
 
     public bool IsWalking()
     {
-        return false;
+        return (Input.GetAxis("Horizontal") != 0);
     }
+
     public bool IsGrounded()
     {
-        return false;
+        return !(Physics2D.Raycast(transform.position, Vector2.down, 0.75f, LayerMask.GetMask("ground")));
+
     }
 
     public FacingDirection GetFacingDirection()
     {
-        return FacingDirection.left;
+        if (Input.GetAxis("Horizontal") > 0)
+        {
+            return FacingDirection.right;
+        }
+       
+        if (Input.GetAxis("Horizontal") < 0)
+        {
+            return FacingDirection.left;
+        }
+        return FacingDirection.right;
     }
 }
