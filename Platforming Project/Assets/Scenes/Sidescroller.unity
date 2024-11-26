@@ -1694,7 +1694,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 1433354317}
-  maxSpeed: 6
+  maxSpeed: 5
+  apexHeight: 3
+  apexTime: 0.5
+  gravity: 1
+  jumpVelocity: 0
+  isJumping: 0
+  time: 0
 --- !u!4 &1433354315
 Transform:
   m_ObjectHideFlags: 0
@@ -1789,7 +1795,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 6
+  m_Constraints: 4
 --- !u!61 &1433354318
 BoxCollider2D:
   m_ObjectHideFlags: 0
