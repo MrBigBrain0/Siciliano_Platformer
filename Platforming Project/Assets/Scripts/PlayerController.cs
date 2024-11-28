@@ -1,103 +1,166 @@
-using JetBrains.Annotations;
 using UnityEngine;
+
+public enum PlayerDirection
+{
+    left, right
+}
+
+public enum PlayerState
+{
+    idle, walking, jumping, dead
+}
 
 public class PlayerController : MonoBehaviour
 {
-    public Rigidbody2D rb;
-    public float maxSpeed;
-    public float apexHeight;
-    public float apexTime;
-    public float gravity;
-    public float jumpVelocity;
-    private float velocity;
-    public bool isJumping;
-    public float time;
+    [SerializeField] private Rigidbody2D body;
+    private PlayerDirection currentDirection = PlayerDirection.right;
+    public PlayerState currentState = PlayerState.idle;
+    public PlayerState previousState = PlayerState.idle;
 
-    public enum FacingDirection
+    [Header("Horizontal")]
+    public float maxSpeed = 5f;
+    public float accelerationTime = 0.25f;
+    public float decelerationTime = 0.15f;
+
+    [Header("Vertical")]
+    public float apexHeight = 3f;
+    public float apexTime = 0.5f;
+
+    [Header("Ground Checking")]
+    public float groundCheckOffset = 0.5f;
+    public Vector2 groundCheckSize = new(0.4f, 0.1f);
+    public LayerMask groundCheckMask;
+
+    private float accelerationRate;
+    private float decelerationRate;
+
+    private float gravity;
+    private float initialJumpSpeed;
+
+    private bool isGrounded = false;
+    public bool isDead = false;
+
+    private Vector2 velocity;
+
+    public void Start()
     {
-        left, right
+        body.gravityScale = 0;
+
+        accelerationRate = maxSpeed / accelerationTime;
+        decelerationRate = maxSpeed / decelerationTime;
+
+        gravity = -2 * apexHeight / (apexTime * apexTime);
+        initialJumpSpeed = 2 * apexHeight / apexTime;
     }
 
-    PlayerController.FacingDirection lastDirection;
-    // Start is called before the first frame update
-    void Start()
+    public void Update()
     {
-        rb = GetComponent<Rigidbody2D>();
-    }
+        previousState = currentState;
 
-    // Update is called once per frame
-    void Update()
-    {
-        // The input from the player needs to be determined and
-        // then passed in the to the MovementUpdate which should
-        // manage the actual movement of the character.
-        Vector2 playerInput = new Vector2(Input.GetAxis("Horizontal"), 0);
-        Vector2 playerJump = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        CheckForGround();
 
-        time = Time.deltaTime;
+        Vector2 playerInput = new Vector2();
+        playerInput.x = Input.GetAxisRaw("Horizontal");
 
-        MovementUpdate(playerInput,playerJump);
-
-    }
-
-    private void MovementUpdate(Vector2 playerInput , Vector2 playerJump)
-    {
-        apexTime = apexTime * time;
-
-        rb.velocity = playerInput * maxSpeed;
-        rb.AddForce(playerInput);
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isDead)
         {
-            gravity = -2 * apexHeight / (Mathf.Pow(apexTime ,2 ));
-            jumpVelocity = 2 * apexHeight / apexTime;
-            velocity = gravity * time + jumpVelocity;
-
-            rb.velocity = new Vector2(rb.velocity.x , rb.velocity.y) * maxSpeed * velocity;
-
-
-            isJumping = true;
+            currentState = PlayerState.dead;
         }
 
-        // I did this early it is supposed to be part of task 1
-        if(isJumping == true)
+        switch(currentState)
         {
-            rb.gravityScale = 0;
+            case PlayerState.dead:
+                // do nothing - we ded.
+                break;
+            case PlayerState.idle:
+                if (!isGrounded) currentState = PlayerState.jumping;
+                else if (velocity.x != 0) currentState = PlayerState.walking;
+                break;
+            case PlayerState.walking:
+                if (!isGrounded) currentState = PlayerState.jumping;
+                else if (velocity.x == 0) currentState = PlayerState.idle;
+                break;
+            case PlayerState.jumping:
+                if (isGrounded)
+                {
+                    if (velocity.x != 0) currentState = PlayerState.walking;
+                    else currentState = PlayerState.idle;
+                }
+                break;
+        }
+
+        MovementUpdate(playerInput);
+        JumpUpdate();
+
+        if (!isGrounded)
+            velocity.y += gravity * Time.deltaTime;
+        else
+            velocity.y = 0;
+
+        body.velocity = velocity;
+    }
+
+    private void MovementUpdate(Vector2 playerInput)
+    {
+        if (playerInput.x < 0)
+            currentDirection = PlayerDirection.left;
+        else if (playerInput.x > 0)
+            currentDirection = PlayerDirection.right;
+
+        if (playerInput.x != 0)
+        {
+            velocity.x += accelerationRate * playerInput.x * Time.deltaTime;
+            velocity.x = Mathf.Clamp(velocity.x, -maxSpeed, maxSpeed);
         }
         else
         {
-            rb.gravityScale = 1;
+            if (velocity.x > 0)
+            {
+                velocity.x -= decelerationRate * Time.deltaTime;
+                velocity.x = Mathf.Max(velocity.x, 0);
+            }
+            else if (velocity.x < 0)
+            {
+                velocity.x += decelerationRate * Time.deltaTime;
+                velocity.x = Mathf.Min(velocity.x, 0);
+            }
         }
+    }
 
+    private void JumpUpdate()
+    {
+        if (isGrounded && Input.GetButton("Jump"))
+        {
+            velocity.y = initialJumpSpeed;
+            isGrounded = false;
+        }
+    }
+
+    private void CheckForGround()
+    {
+        isGrounded = Physics2D.OverlapBox(
+            transform.position + Vector3.down * groundCheckOffset,
+            groundCheckSize,
+            0,
+            groundCheckMask);
+    }
+
+    public void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position + Vector3.down * groundCheckOffset, groundCheckSize);
     }
 
     public bool IsWalking()
     {
-        return (Input.GetAxis("Horizontal") != 0);
-
-
+        return velocity.x != 0;
     }
-
     public bool IsGrounded()
     {
-        return !(Physics2D.Raycast(transform.position, Vector2.down, 0.75f, LayerMask.GetMask("ground")));
-
+        return isGrounded;
     }
 
-    public FacingDirection GetFacingDirection()
+    public PlayerDirection GetFacingDirection()
     {
-        if (Input.GetAxis("Horizontal") > 0)
-        {
-            lastDirection = FacingDirection.right;
-            return FacingDirection.right;
-        }
-       
-        if (Input.GetAxis("Horizontal") < 0)
-        {
-            lastDirection = FacingDirection.left;
-            return FacingDirection.left;
-        }
-        return lastDirection;
+        return currentDirection;
     }
-
 }
