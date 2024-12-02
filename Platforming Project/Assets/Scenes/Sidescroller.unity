@@ -1743,6 +1743,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   isDead: 0
+  currentPosition: {x: 0, y: 0}
+  dashingForce: 30
+  time: 0
 --- !u!4 &1433354315
 Transform:
   m_ObjectHideFlags: 0

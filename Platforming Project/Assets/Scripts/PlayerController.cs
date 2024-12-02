@@ -40,13 +40,16 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     public bool isDead = false;
 
-
     private Vector2 velocity;
 
-    //Task 1 assinment 2
+    //Task 1 assingment 2
     public Vector2 currentPosition;
     bool hasDashed;
     public float dashingForce = 25f;
+
+    //Task 2 assignment 2
+    public float time;
+    bool chargeJumping;
 
     public void Start()
     {
@@ -126,6 +129,17 @@ public class PlayerController : MonoBehaviour
         }
 
         Dash();
+
+        //code for task 2 assignment 2
+
+        if (Input.GetKey(KeyCode.Tab) && isGrounded)
+        {
+            //chargeJumping = true;
+
+            time += Time.deltaTime;
+        }
+
+        ChargeJump();
 
     }
 
@@ -208,6 +222,30 @@ public class PlayerController : MonoBehaviour
         }
 
         hasDashed = false;
+
+    }
+
+
+    private void ChargeJump()
+    {
+        if(time >= 3f  )
+        {
+            chargeJumping = true;
+            initialJumpSpeed = 20f;
+            Debug.Log("JUMP READY");
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {   
+                chargeJumping = false;
+                time = 0;
+            }
+            
+
+        }
+        if (time == 0)
+        {
+            initialJumpSpeed = 2 * apexHeight / apexTime;
+        }
 
     }
 }
