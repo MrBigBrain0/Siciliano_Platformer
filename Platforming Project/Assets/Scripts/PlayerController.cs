@@ -40,12 +40,13 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     public bool isDead = false;
 
-    public Vector2 currentPosition;
-
-    bool hasDashed;
-    public float dashingForce = 25f;
 
     private Vector2 velocity;
+
+    //Task 1 assinment 2
+    public Vector2 currentPosition;
+    bool hasDashed;
+    public float dashingForce = 25f;
 
     public void Start()
     {
