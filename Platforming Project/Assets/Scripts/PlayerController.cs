@@ -40,6 +40,11 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     public bool isDead = false;
 
+    public Vector2 currentPosition;
+
+    bool hasDashed;
+    public float dashingForce = 25f;
+
     private Vector2 velocity;
 
     public void Start()
@@ -51,11 +56,14 @@ public class PlayerController : MonoBehaviour
 
         gravity = -2 * apexHeight / (apexTime * apexTime);
         initialJumpSpeed = 2 * apexHeight / apexTime;
+
     }
 
     public void Update()
     {
         previousState = currentState;
+
+        currentPosition = transform.position;
 
         CheckForGround();
 
@@ -92,12 +100,32 @@ public class PlayerController : MonoBehaviour
         MovementUpdate(playerInput);
         JumpUpdate();
 
+        //task 1 for dashing
+        if (Input.GetKeyDown(KeyCode.LeftShift) && hasDashed == false)
+            Dash();
+
         if (!isGrounded)
             velocity.y += gravity * Time.deltaTime;
         else
             velocity.y = 0;
 
         body.velocity = velocity;
+
+        // the player cant dash when they are on the ground
+        if (isGrounded == true)
+        {
+            hasDashed = false;
+        }
+
+        if(Input.GetKeyDown(KeyCode.LeftShift) && !isGrounded)
+        {
+            hasDashed = true;   
+
+            Debug.Log("we jumping");
+        }
+
+        Dash();
+
     }
 
     private void MovementUpdate(Vector2 playerInput)
@@ -162,5 +190,23 @@ public class PlayerController : MonoBehaviour
     public PlayerDirection GetFacingDirection()
     {
         return currentDirection;
+    }
+
+    private void Dash()
+    {
+
+        if (hasDashed && currentDirection == PlayerDirection.left)
+        {
+            velocity.x -= velocity.x + dashingForce;
+            Debug.Log("Dashing left");
+        }
+        else if (hasDashed && currentDirection == PlayerDirection.right)
+        {
+            velocity.x += velocity.x + dashingForce;
+            Debug.Log("Dashing right");
+        }
+
+        hasDashed = false;
+
     }
 }
