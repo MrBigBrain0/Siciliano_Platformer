@@ -231,7 +231,7 @@ public class PlayerController : MonoBehaviour
         if(time >= 3f  )
         {
             chargeJumping = true;
-            initialJumpSpeed = 20f;
+            initialJumpSpeed = 30f;
             Debug.Log("JUMP READY");
 
             if (Input.GetKeyDown(KeyCode.Space))

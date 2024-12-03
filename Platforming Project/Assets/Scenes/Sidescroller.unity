@@ -355,7 +355,7 @@ GameObject:
   - component: {fileID: 1054579206}
   - component: {fileID: 1054579210}
   - component: {fileID: 1054579209}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: GroundTilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1735,16 +1735,16 @@ MonoBehaviour:
   maxSpeed: 5
   accelerationTime: 0.25
   decelerationTime: 0.15
-  apexHeight: 4
+  apexHeight: 5
   apexTime: 0.5
   groundCheckOffset: 0.595
-  groundCheckSize: {x: 0.6, y: 0.1}
+  groundCheckSize: {x: 0.5, y: 0.1}
   groundCheckMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 64
   isDead: 0
   currentPosition: {x: 0, y: 0}
-  dashingForce: 30
+  dashingForce: 20
   time: 0
 --- !u!4 &1433354315
 Transform:
