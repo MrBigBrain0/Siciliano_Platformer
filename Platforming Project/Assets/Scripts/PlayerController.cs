@@ -40,6 +40,9 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = false;
     public bool isDead = false;
 
+    //task 3 assignment 2
+    private bool onSpring = false;
+
     private Vector2 velocity;
 
     //Task 1 assingment 2
@@ -51,6 +54,10 @@ public class PlayerController : MonoBehaviour
     public float time;
     bool chargeJumping;
     public float time2;
+
+    //Task 3 assignment 3
+    public LayerMask Spring;
+
 
     public void Start()
     {
@@ -152,6 +159,14 @@ public class PlayerController : MonoBehaviour
             chargeJumping = false;  
             time2 = 0;
         }
+
+        //Task 3 assignment 2
+        CheckForSpring();
+
+        if (onSpring)
+        {
+            velocity.y += 3;
+        }
     }
 
     private void MovementUpdate(Vector2 playerInput)
@@ -199,6 +214,12 @@ public class PlayerController : MonoBehaviour
             groundCheckMask);
     }
 
+    // task 3 assignment 2
+    private void CheckForSpring()
+    {
+        onSpring = Physics2D.OverlapBox(transform.position + Vector3.up * groundCheckOffset, groundCheckSize, 0, Spring);
+    }
+
     public void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position + Vector3.down * groundCheckOffset, groundCheckSize);
@@ -211,6 +232,10 @@ public class PlayerController : MonoBehaviour
     public bool IsGrounded()
     {
         return isGrounded;
+    }
+    public bool OnSpring()
+    {
+        return onSpring;
     }
 
     public PlayerDirection GetFacingDirection()
@@ -235,7 +260,6 @@ public class PlayerController : MonoBehaviour
         hasDashed = false;
 
     }
-
 
     private void ChargeJump()
     {
