@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     //Task 2 assignment 2
     public float time;
     bool chargeJumping;
+    public float time2;
 
     public void Start()
     {
@@ -141,6 +142,16 @@ public class PlayerController : MonoBehaviour
 
         ChargeJump();
 
+        if( chargeJumping == true)
+        {
+            time2 += Time.deltaTime;
+        }
+
+        if (time2 >= 3)
+        {
+            chargeJumping = false;  
+            time2 = 0;
+        }
     }
 
     private void MovementUpdate(Vector2 playerInput)
@@ -231,20 +242,18 @@ public class PlayerController : MonoBehaviour
         if(time >= 3f  )
         {
             chargeJumping = true;
+
             initialJumpSpeed = 30f;
+
             Debug.Log("JUMP READY");
 
-            if (Input.GetKeyDown(KeyCode.Space))
-            {   
-                chargeJumping = false;
+
+            if (time2 >= 2)
+            {
+                initialJumpSpeed = 2 * apexHeight / apexTime;
+
                 time = 0;
             }
-            
-
-        }
-        if (time == 0)
-        {
-            initialJumpSpeed = 2 * apexHeight / apexTime;
         }
 
     }
