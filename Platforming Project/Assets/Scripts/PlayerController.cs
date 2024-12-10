@@ -38,10 +38,7 @@ public class PlayerController : MonoBehaviour
     private float initialJumpSpeed;
 
     private bool isGrounded = false;
-    public bool isDead = false;
-
-    //task 3 assignment 2
-    private bool onSpring = false;
+    public bool isDead = false;   
 
     private Vector2 velocity;
 
@@ -57,6 +54,7 @@ public class PlayerController : MonoBehaviour
 
     //Task 3 assignment 3
     public LayerMask Spring;
+    private bool onSpring = false;
 
 
     public void Start()
@@ -123,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
         body.velocity = velocity;
 
-        // the player cant dash when they are on the ground
+       
         if (isGrounded == true)
         {
             hasDashed = false;
@@ -243,6 +241,7 @@ public class PlayerController : MonoBehaviour
         return currentDirection;
     }
 
+    //task 1
     private void Dash()
     {
 
@@ -261,6 +260,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    //task 2
     private void ChargeJump()
     {
         if(time >= 3f  )
